@@ -26,4 +26,12 @@ export class UserService {
 
     return user;
   }
+
+  async findUser(steamId: string): Promise<UserDocument> {
+    const user: UserDocument | null = await this.userModel.findOne({
+      id: steamId,
+    });
+
+    return user;
+  }
 }

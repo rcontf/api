@@ -1,0 +1,19 @@
+import { Module } from '@nestjs/common';
+import { JWTService } from './jwt.service';
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigService, ConfigModule } from '@nestjs/config';
+import { JWTConfigService } from './jwt.config';
+import { UserService } from 'src/users/users.service';
+
+@Module({
+  imports: [
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useClass: JWTConfigService,
+      inject: [ConfigService],
+    })
+  ],
+  providers: [JWTService, JWTConfigService, UserService],
+  exports: [JwtModule, JWTService],
+})
+export class JWTModule {}
