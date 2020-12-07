@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { CreateTestDto } from './dto/test.dto';
 import { TestService } from './test.service';
 
@@ -12,7 +12,9 @@ export class TestController {
   }
 
   @Post('/')
-  async createTest(@Body() createTestDto: CreateTestDto) {
+  async createTest(
+    @Body(new ValidationPipe({ transform: true })) createTestDto: CreateTestDto,
+  ) {
     await this.testService.create(createTestDto);
   }
 }
