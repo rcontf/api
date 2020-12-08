@@ -34,4 +34,8 @@ export class UserService {
 
     return user;
   }
+
+  async deleteUser(steamId: string): Promise<void> {
+    await this.userModel.findOneAndDelete({ id: steamId });
+  }
 }
