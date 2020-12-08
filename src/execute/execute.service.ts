@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ExecuteCommandDto } from './dto/create-execute.dto';
+import { ExecuteCommandDto } from './dto/execute.dto';
 import Rcon from './rcon/rcon';
 
 @Injectable()
