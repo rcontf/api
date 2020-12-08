@@ -1,5 +1,6 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 import { User } from './decorators/user.decorator';
 import { UserEntity } from './decorators/user.type';
 import { UserService } from './users.service';
@@ -15,8 +16,9 @@ export class UsersController {
   }
 
   @Delete()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteProfile(@User() user: UserEntity) {
+  async deleteProfile(@User() user: UserEntity, @Res() res: Response) {
     await this.userService.deleteUser(user.id);
+    res.clearCookie('token');
+    res.redirect('/');
   }
 }
