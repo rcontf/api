@@ -8,7 +8,6 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TestModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         STEAM_API_KEY: Joi.string().trim().required(),
