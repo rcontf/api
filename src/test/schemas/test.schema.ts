@@ -5,7 +5,7 @@ export type TestDocument = Test & Document;
 
 @Schema()
 export class Test {
-  @Prop()
+  @Prop({ required: true })
   name: string;
 }
 
