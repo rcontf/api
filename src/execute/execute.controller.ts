@@ -4,10 +4,11 @@ import { ExecuteCommandDto } from './dto/create-execute.dto';
 
 @Controller('execute')
 export class ExecuteController {
-  constructor(private readonly executeService: ExecuteService) {}
+  constructor(private executeService: ExecuteService) {}
 
   @Post()
-  create(@Body() createExecuteDto: ExecuteCommandDto) {
-    return this.executeService.execute(createExecuteDto);
+  async execute(@Body() executeBody: ExecuteCommandDto) {
+    const response = await this.executeService.execute(executeBody);
+    return response;
   }
 }
