@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ExecuteModule } from './execute/execute.module';
 import { ServersModule } from './servers/servers.module';
+import { UpdateModule } from './update/update.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ServersModule } from './servers/servers.module';
     UsersModule,
     ExecuteModule,
     ServersModule,
+    UpdateModule,
   ],
 })
 export class AppModule {}
