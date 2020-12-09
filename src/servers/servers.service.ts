@@ -21,6 +21,16 @@ export class ServersService {
   }
 
   async createServer(steamId: string, serverDto: CreateServerDto) {
+    const userServers = await this.getUserServers(steamId);
+
+    const doesUserHaveServer = userServers.find(
+      (server) => server.ip === serverDto.ip,
+    );
+
+    if (doesUserHaveServer) return false;
+
+    if (userServers.length >= 3) return false;
+
     const newServer = new this.severModel({
       owner: steamId,
       hostname: serverDto.hostname ?? serverDto.ip,
