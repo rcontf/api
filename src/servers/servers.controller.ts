@@ -11,6 +11,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { LogsService } from 'src/logs/logs.service';
+import { ActionType } from 'src/logs/types/action.type';
 import { User } from 'src/users/decorators/user.decorator';
 import { UserEntity } from 'src/users/decorators/user.type';
 import { CreateServerDto } from './dto/create-server.dto';
@@ -22,7 +24,10 @@ import { ServersService } from './servers.service';
 @UsePipes(new ValidationPipe({ transform: true, disableErrorMessages: true }))
 @Controller('servers')
 export class ServersController {
-  constructor(private serversService: ServersService) {}
+  constructor(
+    private serversService: ServersService,
+    private logsService: LogsService,
+  ) {}
 
   @Get()
   async getAllServers(@User() user: UserEntity) {
@@ -32,10 +37,9 @@ export class ServersController {
   @Post()
   async createServer(
     @User() user: UserEntity,
-    @Body()
-    createServerDto: CreateServerDto,
+    @Body() createServerDto: CreateServerDto,
   ) {
-    return this.serversService.createServer(user.id, createServerDto);
+    return await this.serversService.createServer(user.id, createServerDto);
   }
 
   @Delete(':ip')
@@ -50,7 +54,9 @@ export class ServersController {
   async updateServer(
     @Param('ip') ip: string,
     @Body() serverBody: UpdateServerDto,
+    @User() user: UserEntity,
   ) {
-    return await this.serversService.updateServer(ip, serverBody);
+    await this.serversService.updateServer(ip, serverBody);
+    this.logsService.createLog(ip, user.id, ActionType.UPDATED);
   }
 }

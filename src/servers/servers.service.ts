@@ -9,10 +9,10 @@ import { Server, ServerDocument } from './schemas/server.schema';
 export class ServersService {
   constructor(
     @InjectModel(Server.name)
-    private readonly severModel: Model<ServerDocument>,
+    private severModel: Model<ServerDocument>,
   ) {}
 
-  private async getServer(ip: string) {
+  async getServer(ip: string) {
     return await this.severModel.findOne({ ip: ip });
   }
 
