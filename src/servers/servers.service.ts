@@ -9,10 +9,10 @@ import { Server, ServerDocument } from './schemas/server.schema';
 export class ServersService {
   constructor(
     @InjectModel(Server.name)
-    private readonly severModel: Model<ServerDocument>,
+    private severModel: Model<ServerDocument>,
   ) {}
 
-  private async getServer(ip: string) {
+  async getServer(ip: string) {
     return await this.severModel.findOne({ ip: ip });
   }
 
@@ -21,6 +21,16 @@ export class ServersService {
   }
 
   async createServer(steamId: string, serverDto: CreateServerDto) {
+    const userServers = await this.getUserServers(steamId);
+
+    const doesUserHaveServer = userServers.find(
+      (server) => server.ip === serverDto.ip,
+    );
+
+    if (doesUserHaveServer) return false;
+
+    if (userServers.length >= 3) return false;
+
     const newServer = new this.severModel({
       owner: steamId,
       hostname: serverDto.hostname ?? serverDto.ip,
