@@ -25,7 +25,8 @@ export class SteamController {
   ): Promise<void> {
     const host = this.configService.get<string>('HOST');
     const token = await this.jwtService.login(req.user);
-    const cookieDomain = host === 'http://localhost:3000' ? 'localhost' : host;
+    const highLevelDomain = host.split('/')[2];
+    const cookieDomain = highLevelDomain === 'localhost:3000' ? highLevelDomain.split(':3000')[0] : highLevelDomain;
     res.cookie('token', token, {
       domain: cookieDomain,
       expires: new Date(Date.now() + 12 * 3600000),
