@@ -30,8 +30,6 @@ export class SteamController {
     res.cookie('token', token, {
       domain: cookieDomain,
       expires: new Date(Date.now() + 12 * 3600000),
-      sameSite: "none",
-      httpOnly: true
     });
     res.redirect(host + '/success');
   }
