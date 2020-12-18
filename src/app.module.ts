@@ -17,7 +17,7 @@ import { LogsModule } from './logs/logs.module';
         JWT_SECRET: Joi.string().trim().required(),
         PORT: Joi.number().failover(8080).default(8080),
         DATABASE_URL: Joi.string().trim().required(),
-        HOST: Joi.string().default('http://localhost:3000/'),
+        HOST: Joi.string().default('http://localhost:3000'),
       }),
     }),
     MongooseModule.forRootAsync({

@@ -23,9 +23,13 @@ export class SteamController {
     @Req() req: Request,
     @Response() res: IExpressResponse,
   ): Promise<void> {
-    const redirectUrl = this.configService.get<string>('HOST');
+    const host = this.configService.get<string>('HOST');
     const token = await this.jwtService.login(req.user);
-    res.cookie('token', token);
-    res.redirect(redirectUrl + '/success');
+    const cookieDomain = host === 'http://localhost:3000' ? 'localhost' : host;
+    res.cookie('token', token, {
+      domain: cookieDomain,
+      expires: new Date(Date.now() + 12 * 3600000),
+    });
+    res.redirect(host + '/success');
   }
 }
