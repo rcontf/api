@@ -29,7 +29,7 @@ export class SteamController {
     const cookieDomain = highLevelDomain === 'localhost:3000' ? highLevelDomain.split(':3000')[0] : highLevelDomain;
     console.log(cookieDomain);
     res.cookie('token', token, {
-      domain: cookieDomain,
+      // domain: cookieDomain,
       expires: new Date(Date.now() + 12 * 3600000),
     });
     res.redirect(host + '/success');
