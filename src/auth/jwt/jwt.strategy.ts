@@ -9,9 +9,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(readonly jwtConfigService: JWTConfigService, private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(req) => {
-        console.log(req.cookies['token']);
+        console.log(req.cookies['token'] ?? "No token");
+        console.log(req.headers)
         return req.cookies['token']
-      }]),
+      },]),
       ignoreExpiration: false,
       secretOrKey: jwtConfigService.createJwtOptions().secret,
     });
