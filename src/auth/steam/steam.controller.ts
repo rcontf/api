@@ -10,7 +10,6 @@ export class SteamController {
   constructor(
     private jwtService: JWTService,
     readonly steamStrategy: SteamStrategy,
-    private configService: ConfigService,
   ) {}
 
   @UseGuards(AuthGuard('steam'))
@@ -23,14 +22,10 @@ export class SteamController {
     @Req() req: Request,
     @Response() res: IExpressResponse,
   ): Promise<void> {
-    const host = this.configService.get<string>('HOST');
     const token = await this.jwtService.login(req.user);
-    const highLevelDomain = host.split('/')[2];
-    const cookieDomain = highLevelDomain === 'localhost:3000' ? highLevelDomain.split(':3000')[0] : highLevelDomain;
     res.cookie('token', token, {
-      domain: cookieDomain,
-      expires: new Date(Date.now() + 12 * 3600000)
+      expires: new Date(Date.now() + 12 * 3600000),
     });
-    res.redirect(host + '/success');
+    res.redirect('/success');
   }
 }
