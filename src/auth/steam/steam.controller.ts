@@ -26,6 +26,6 @@ export class SteamController {
     res.cookie('token', token, {
       expires: new Date(Date.now() + 12 * 3600000),
     });
-    res.redirect('/success');
+    res.redirect('/');
   }
 }
