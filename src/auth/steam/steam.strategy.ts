@@ -16,8 +16,8 @@ export class SteamStrategy extends PassportStrategy(Strategy) {
     @Inject(REQUEST) readonly req: Request,
   ) {
     super({
-      returnURL: `${req.protocol}://${req.headers['host'] || 'localhost:8080'}/api/auth/steam/return`,
-      realm: `${req.protocol}://${req.headers['host'] || 'localhost:8080'}`,
+      returnURL: `${configService.get<string>('HOST') || 'localhost:8080'}/api/auth/steam/return`,
+      realm: `${configService.get<string>('HOST') || 'localhost:8080'}`,
       apiKey: configService.get<string>('STEAM_API_KEY'),
     });
   }
