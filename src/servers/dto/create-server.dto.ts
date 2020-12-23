@@ -20,6 +20,6 @@ export class CreateServerDto {
 
     @Expose()
     get connectAddress(): string {
-        return `rcon_address ${this.hostname}${this.port + ";" ?? ';'}; rcon_password ${this.password}`;
+        return `rcon_address ${this.hostname}${this.port}; rcon_password ${this.password}`;
     }
 }
