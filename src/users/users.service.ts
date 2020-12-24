@@ -19,6 +19,7 @@ export class UserService {
       user = new this.userModel({
         id: reqUser._json.steamid,
         avatar: reqUser._json.avatarfull,
+        name: reqUser._json.personaname,
       });
 
       await user.save();
