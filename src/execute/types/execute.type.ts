@@ -3,7 +3,7 @@ export enum RconErrorResponse {
 }
 
 export interface RconSuccessfulResponse {
-  body: string | boolean;
+  body: string;
 }
 export interface RconFailedResponse {
   error: string;

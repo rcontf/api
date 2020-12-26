@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ExecuteCommandDto } from './dto/execute.dto';
-import Rcon from './rcon/rcon';
+import Rcon from '@c43721/ts-rcon';
 import { RconResponse, RconErrorResponse } from './types/execute.type';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ExecuteService {
       const response = await rconClient.execute(executeDto.command);
       await rconClient.disconnect();
       return {
-        body: response,
+        body: response.toString(),
       };
     } catch (err) {
       switch (err.code) {
