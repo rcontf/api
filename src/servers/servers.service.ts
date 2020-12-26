@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateServerDto } from './dto/create-server.dto';
@@ -23,13 +28,15 @@ export class ServersService {
   async createServer(steamId: string, serverDto: CreateServerDto) {
     const userServers = await this.getUserServers(steamId);
 
-    const doesUserHaveServer = userServers.find(
+    const userHasServer = userServers.find(
       (server) => server.ip === serverDto.ip,
     );
 
-    if (doesUserHaveServer) return false;
+    if (userHasServer)
+      throw new BadRequestException('You already have this server added');
 
-    if (userServers.length >= 3) return false;
+    if (userServers.length >= 3)
+      throw new ForbiddenException('You have too many saved servers');
 
     const newServer = new this.severModel({
       owner: steamId,
@@ -50,7 +57,7 @@ export class ServersService {
 
     const doesUserHaveServer = userServers.find((server) => server.ip === ip);
 
-    if (!doesUserHaveServer) return false;
+    if (!doesUserHaveServer) throw new NotFoundException('Cannot find server');
 
     return await this.severModel.findOneAndDelete({ ip: ip });
   }
@@ -58,10 +65,8 @@ export class ServersService {
   async updateServer(ip: string, server: UpdateServerDto) {
     const foundServer = await this.getServer(ip);
 
-    if (!foundServer) return false;
+    if (!foundServer) throw new NotFoundException('Cannot find server');
 
-    await foundServer.updateOne(server);
-
-    return true;
+    return await foundServer.updateOne(server);
   }
 }
