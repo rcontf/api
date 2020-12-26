@@ -59,7 +59,7 @@ export class ServersService {
 
     if (!doesUserHaveServer) throw new NotFoundException('Cannot find server');
 
-    return await this.severModel.findOneAndDelete({ ip: ip });
+    await this.severModel.findOneAndDelete({ ip: ip });
   }
 
   async updateServer(ip: string, server: UpdateServerDto) {
