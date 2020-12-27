@@ -6,11 +6,9 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
-  Res,
 } from '@nestjs/common';
 import { ExecuteService } from './execute.service';
 import { ExecuteCommandDto } from './dto/execute.dto';
-import { Response } from 'express';
 
 @Controller('execute')
 @UsePipes(new ValidationPipe({ transform: true, disableErrorMessages: true }))
@@ -19,14 +17,7 @@ export class ExecuteController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async execute(
-    @Body() executeBody: ExecuteCommandDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const response = await this.executeService.execute(executeBody);
-    if ('error' in response) {
-      res.status(HttpStatus.BAD_REQUEST);
-    }
-    return response;
+  async execute(@Body() executeBody: ExecuteCommandDto) {
+    return await this.executeService.execute(executeBody);
   }
 }

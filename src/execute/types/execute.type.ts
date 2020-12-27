@@ -1,9 +1,10 @@
 export enum RconErrorResponse {
   REFUSED = 'ECONNREFUSED',
+  UNAUTHENTICATED = 'Error: Unable to authenticate',
 }
 
 export interface RconSuccessfulResponse {
-  body: string | boolean;
+  body: string;
 }
 export interface RconFailedResponse {
   error: string;
