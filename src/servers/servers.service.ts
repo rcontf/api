@@ -67,6 +67,7 @@ export class ServersService {
 
     if (!foundServer) throw new NotFoundException('Cannot find server');
 
-    return await foundServer.updateOne(server);
+    await foundServer.updateOne(server);
+    return server;
   }
 }
