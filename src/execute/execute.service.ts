@@ -31,8 +31,13 @@ export class ExecuteService {
         throw new BadRequestException('Bad RCON password');
 
       switch (err.code) {
+        case RconErrorResponse.NOT_FOUND:
         case RconErrorResponse.REFUSED:
-          throw new BadRequestException('Could not connect to server');
+          throw new BadRequestException(
+            'Check the IP or port of the server',
+            'Could not connect to server',
+          );
+
         default:
           throw new InternalServerErrorException('Could not reach server');
       }

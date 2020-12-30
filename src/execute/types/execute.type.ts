@@ -1,5 +1,6 @@
 export enum RconErrorResponse {
   REFUSED = 'ECONNREFUSED',
+  NOT_FOUND = 'ENOTFOUND',
   UNAUTHENTICATED = 'Error: Unable to authenticate',
 }
 
