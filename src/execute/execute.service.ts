@@ -28,8 +28,12 @@ export class ExecuteService {
     } catch (err) {
       // Catch if the error was from RCON library
       if (err.toString() == RconErrorResponse.UNAUTHENTICATED)
-        throw new BadRequestException('Bad RCON password');
+        throw new BadRequestException(
+          'Check your RCON password',
+          'Bad RCON password',
+        );
 
+      // Catch other errors from the RCON library / promise errors
       switch (err.code) {
         case RconErrorResponse.NOT_FOUND:
         case RconErrorResponse.REFUSED:
