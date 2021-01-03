@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ExecuteCommandDto } from './dto/execute.dto';
-import Rcon from '@c43721/ts-rcon';
+import Rcon from 'rcon-srcds';
 import { RconResponse, RconErrorResponse } from './types/execute.type';
 
 @Injectable()
@@ -28,11 +28,20 @@ export class ExecuteService {
     } catch (err) {
       // Catch if the error was from RCON library
       if (err.toString() == RconErrorResponse.UNAUTHENTICATED)
-        throw new BadRequestException('Bad RCON password');
+        throw new BadRequestException(
+          'Check your RCON password',
+          'Bad RCON password',
+        );
 
+      // Catch other errors from the RCON library / promise errors
       switch (err.code) {
+        case RconErrorResponse.NOT_FOUND:
         case RconErrorResponse.REFUSED:
-          throw new BadRequestException('Could not connect to server');
+          throw new BadRequestException(
+            'Check the IP or port of the server',
+            'Could not connect to server',
+          );
+
         default:
           throw new InternalServerErrorException('Could not reach server');
       }
