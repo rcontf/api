@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ExecuteCommandDto } from './dto/execute.dto';
-import Rcon from '@c43721/ts-rcon';
+import Rcon from 'rcon-srcds';
 import { RconResponse, RconErrorResponse } from './types/execute.type';
 
 @Injectable()
