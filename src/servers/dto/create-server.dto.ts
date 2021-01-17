@@ -1,5 +1,5 @@
-import { Expose } from "class-transformer/decorators";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { Expose } from "class-transformer"
 import { ServerType } from "../schemas/server.schema";
 
 export class CreateServerDto {
