@@ -13,7 +13,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
 
-  // app.setGlobalPrefix('/api');
+  app.setGlobalPrefix('/api');
 
   await app.listen(port);
 }
