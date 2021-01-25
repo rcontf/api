@@ -30,6 +30,12 @@ export class ExecuteService {
     this.serverIp = configService.get('SERVER_IP');
   }
 
+  /**
+   * Edits a logaddress
+   * @param serverDetails Details of server
+   * @param port port to assign
+   * @param add Removing or adding this log address
+   */
   private async editLogAddress(
     serverDetails: SubscribeServerDto,
     port: number,
@@ -103,6 +109,7 @@ export class ExecuteService {
       port: 9871 // @TODO: Replace with random, free port
     });
 
+    // Emit data to each consumer
     reciever.on('data', (data) =>
       client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
     );
@@ -115,6 +122,7 @@ export class ExecuteService {
 
     await this.editLogAddress(listener.server, listener.port, false);
 
+    // Cleanup listeners, and close port to allow re-assignment
     listener.reciever.removeAllListeners();
     listener.reciever.socket.close();
 
