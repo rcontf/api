@@ -6,6 +6,7 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import SubscribedMessage from './enums/socket.messages';
 
 @WebSocketGateway()
 export class ExecuteGateway implements OnGatewayInit {
@@ -15,7 +16,7 @@ export class ExecuteGateway implements OnGatewayInit {
     this.logger.log("WS Server listening");
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage(SubscribedMessage.MESSAGE)
   handleMessage(client: Socket, text: string): WsResponse<string> {
     return { event: 'messageReply', data: text };
   }
