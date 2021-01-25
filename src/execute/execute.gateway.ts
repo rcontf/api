@@ -6,10 +6,11 @@ import {
   WebSocketGateway,
   WsResponse,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import SubscribedMessage from './enums/socket.messages';
 import { ExecuteService } from './execute.service';
+import { SubscribeServerDto } from './dto/subscribe.dto';
 
 @WebSocketGateway({
   namespace: 'dashboard',
@@ -28,20 +29,28 @@ export class ExecuteGateway
     this.logger.log('New connection: ' + client.id);
   }
 
-  handleDisconnect(client: Socket): void {
-    this.executeService.unsubscribe(client.id);
+  async handleDisconnect(client: Socket): Promise<void> {
+    await this.executeService.unsubscribe(client.id);
   }
 
+  @UsePipes(new ValidationPipe({ transform: true }))
   @SubscribeMessage(SubscribedMessage.SUBSCRIBE)
-  handleSubscription(client: Socket, serverIp: string): WsResponse<boolean> {
-    this.executeService.subscribe(client.id, client);
+  async handleSubscription(
+    client: Socket,
+    data: unknown,
+  ): Promise<WsResponse<boolean>> {
+    await this.executeService.subscribe(
+      client.id,
+      client,
+      data as SubscribeServerDto,
+    );
 
     return { event: SubscribedMessage.SUBSCRIBE_FULFILLED, data: true };
   }
 
   @SubscribeMessage(SubscribedMessage.UNSUBSCRIBE)
-  handleUnsubscription(client: Socket): WsResponse<boolean> {
-    this.executeService.unsubscribe(client.id);
+  async handleUnsubscription(client: Socket): Promise<WsResponse<boolean>> {
+    await this.executeService.unsubscribe(client.id);
 
     return { event: SubscribedMessage.UNSUBSCRIBE_FULFILLED, data: true };
   }

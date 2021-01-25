@@ -1,7 +1,5 @@
 import {
   BadRequestException,
-  forwardRef,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -10,14 +8,26 @@ import { ExecuteCommandDto } from './dto/execute.dto';
 import Rcon from 'rcon-srcds';
 import { RconResponse, RconErrorResponse } from './types/execute.type';
 import { LogReceiver } from 'better-srcds-log-receiver';
-import { ExecuteGateway } from './execute.gateway';
 import { Socket } from 'socket.io';
+import * as gp from 'get-port';
 import ExecuteSubscribedMessage from './enums/socket.messages';
+import { ConfigService } from '@nestjs/config';
+import { SubscribeServerDto } from './dto/subscribe.dto';
+import { WsException } from '@nestjs/websockets';
 
+interface Listeners {
+  reciever: LogReceiver;
+  server: SubscribeServerDto;
+}
 @Injectable()
 export class ExecuteService {
   private logger = new Logger(ExecuteService.name);
-  private listeners: Map<string, LogReceiver> = new Map();
+  private listeners: Map<string, Listeners> = new Map();
+
+  private serverIp: string;
+  constructor(public configService: ConfigService) {
+    this.serverIp = configService.get('SERVER_IP');
+  }
 
   async execute(executeDto: ExecuteCommandDto): Promise<RconResponse> {
     const rconClient = new Rcon({
@@ -58,26 +68,56 @@ export class ExecuteService {
     }
   }
 
-  subscribe(id: string, client: Socket) {
-    this.logger.log(`${id} is subscribing to events.`);
+  async subscribe(
+    id: string,
+    client: Socket,
+    serverDetails: SubscribeServerDto,
+  ) {
+    this.logger.log(`${id} subscribing, sending command..`);
+
+    await this.execute({
+      ip: serverDetails.ip,
+      password: serverDetails.password,
+      command: `logaddress_add ${this.serverIp}:9871`,
+      port: serverDetails.port,
+    } as ExecuteCommandDto);
 
     if (!this.listeners.has(id)) {
-      this.listeners.set(id, new LogReceiver());
-      this.listeners.get(id).on('data', (data) => {
+      this.logger.log('Creating logger...');
+      const reciever = new LogReceiver();
+
+      this.logger.log('Adding logger...');
+
+      this.listeners.set(id, {
+        reciever: reciever,
+        server: serverDetails,
+      });
+
+      this.logger.log('Setting up listeners...');
+
+      reciever.on('data', (data) => {
+        this.logger.debug(data.message);
         client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
       });
     } else {
-      this.listeners.get(id).on('data', (data) => {
-        client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
-      });
+      this.logger.error('This should never happen here.');
+      throw new WsException('Hit unwanted point');
     }
   }
 
-  unsubscribe(id: string) {
-    this.logger.log(`${id} is unsubscribing.`);
+  async unsubscribe(id: string) {
     if (!this.listeners.has(id)) return;
 
-    this.listeners.get(id).removeAllListeners();
+    const listener = this.listeners.get(id);
+
+    await this.execute({
+      ip: listener.server.ip,
+      password: listener.server.password,
+      command: `logaddress_del ${this.serverIp}:9871`,
+      port: listener.server.port,
+    } as ExecuteCommandDto);
+
+    this.listeners.get(id).reciever.removeAllListeners();
     this.listeners.delete(id);
   }
 }
