@@ -26,11 +26,12 @@ export class ExecuteGateway
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log('New connection: ' + client.id);
+    this.logger.log('Connected: ' + client.handshake.address);
   }
 
   async handleDisconnect(client: Socket): Promise<void> {
     await this.executeService.unsubscribe(client.id);
+    this.logger.log('Disconnected: ' + client.handshake.address);
   }
 
   @UsePipes(new ValidationPipe({ transform: true }))
