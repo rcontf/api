@@ -13,7 +13,7 @@ import { ExecuteService } from './execute.service';
 import { SubscribeServerDto } from './dto/subscribe.dto';
 
 @WebSocketGateway({
-  namespace: 'dashboard',
+  namespace: '/dashboard',
 })
 export class ExecuteGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -30,7 +30,7 @@ export class ExecuteGateway
   }
 
   async handleDisconnect(client: Socket): Promise<void> {
-    await this.executeService.unsubscribe(client.id, client);
+    await this.executeService.unsubscribe(client.id);
     this.logger.log('Disconnected: ' + client.handshake.address);
   }
 
@@ -51,7 +51,7 @@ export class ExecuteGateway
 
   @SubscribeMessage(SubscribedMessage.UNSUBSCRIBE)
   async handleUnsubscription(client: Socket): Promise<WsResponse<boolean>> {
-    await this.executeService.unsubscribe(client.id, client);
+    await this.executeService.unsubscribe(client.id);
 
     return { event: SubscribedMessage.UNSUBSCRIBE_FULFILLED, data: true };
   }

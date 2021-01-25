@@ -109,18 +109,13 @@ export class ExecuteService {
       port,
     });
 
-    client.join(serverDetails.ip);
-    this.logger.log(`${id} joined room ${serverDetails.ip}`);
-
     // Emit data to each consumer
     reciever.on('data', (data) =>
-      client
-        .to(serverDetails.ip)
-        .emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
+      client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
     );
   }
 
-  async unsubscribe(id: string, client: Socket) {
+  async unsubscribe(id: string) {
     if (!this.listeners.has(id)) return;
 
     const listener = this.listeners.get(id);
@@ -131,7 +126,6 @@ export class ExecuteService {
     listener.reciever.removeAllListeners();
     listener.reciever.socket.close();
 
-    client.leave(listener.server.ip);
     this.listeners.delete(id);
     this.logger.log('Removed ' + id);
   }
