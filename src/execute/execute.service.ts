@@ -1,14 +1,24 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ExecuteCommandDto } from './dto/execute.dto';
 import Rcon from 'rcon-srcds';
 import { RconResponse, RconErrorResponse } from './types/execute.type';
+import { LogReceiver } from 'better-srcds-log-receiver';
+import { ExecuteGateway } from './execute.gateway';
+import { Socket } from 'socket.io';
+import ExecuteSubscribedMessage from './enums/socket.messages';
 
 @Injectable()
 export class ExecuteService {
+  private logger = new Logger(ExecuteService.name);
+  private listeners: Map<string, LogReceiver> = new Map();
+
   async execute(executeDto: ExecuteCommandDto): Promise<RconResponse> {
     const rconClient = new Rcon({
       host: executeDto.ip,
@@ -46,5 +56,28 @@ export class ExecuteService {
           throw new InternalServerErrorException('Could not reach server');
       }
     }
+  }
+
+  subscribe(id: string, client: Socket) {
+    this.logger.log(`${id} is subscribing to events.`);
+
+    if (!this.listeners.has(id)) {
+      this.listeners.set(id, new LogReceiver());
+      this.listeners.get(id).on('data', (data) => {
+        client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
+      });
+    } else {
+      this.listeners.get(id).on('data', (data) => {
+        client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
+      });
+    }
+  }
+
+  unsubscribe(id: string) {
+    this.logger.log(`${id} is unsubscribing.`);
+    if (!this.listeners.has(id)) return;
+
+    this.listeners.get(id).removeAllListeners();
+    this.listeners.delete(id);
   }
 }
