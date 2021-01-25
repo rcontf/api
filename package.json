@@ -27,6 +27,8 @@
     "@nestjs/mongoose": "^7.2.2",
     "@nestjs/passport": "^7.1.5",
     "@nestjs/platform-express": "^7.6.5",
+    "@nestjs/platform-socket.io": "^7.6.5",
+    "@nestjs/websockets": "^7.6.5",
     "class-transformer": "^0.3.2",
     "class-validator": "^0.12.2",
     "cookie-parser": "^1.4.5",
@@ -40,7 +42,8 @@
     "rcon-srcds": "^2.0.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.3"
+    "rxjs": "^6.6.3",
+    "socket.io": "^3.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.4",
