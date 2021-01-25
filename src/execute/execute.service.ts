@@ -73,7 +73,7 @@ export class ExecuteService {
     client: Socket,
     serverDetails: SubscribeServerDto,
   ) {
-    this.logger.log(`${id} subscribing, sending command..`);
+    this.logger.log(`${id} subscribed`);
 
     await this.execute({
       ip: serverDetails.ip,
@@ -83,20 +83,14 @@ export class ExecuteService {
     } as ExecuteCommandDto);
 
     if (!this.listeners.has(id)) {
-      this.logger.log('Creating logger...');
       const reciever = new LogReceiver();
-
-      this.logger.log('Adding logger...');
 
       this.listeners.set(id, {
         reciever: reciever,
         server: serverDetails,
       });
 
-      this.logger.log('Setting up listeners...');
-
       reciever.on('data', (data) => {
-        this.logger.debug(data.message);
         client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
       });
     } else {
@@ -118,6 +112,8 @@ export class ExecuteService {
     } as ExecuteCommandDto);
 
     this.listeners.get(id).reciever.removeAllListeners();
+    this.listeners.get(id).reciever.socket.close();
     this.listeners.delete(id);
+    this.logger.log('Removed ' + id);
   }
 }
