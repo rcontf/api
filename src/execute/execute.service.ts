@@ -99,14 +99,16 @@ export class ExecuteService {
       return this.logger.warn(`${id} is subscribing twice. Ignoring.`);
     }
 
-    await this.editLogAddress(serverDetails, 9871);
-    
+    const port = 9871; // @TODO: Replace with random, free port
+
+    await this.editLogAddress(serverDetails, port);
+
     const reciever = new LogReceiver();
 
     this.listeners.set(id, {
       reciever: reciever,
       server: serverDetails,
-      port: 9871 // @TODO: Replace with random, free port
+      port,
     });
 
     // Emit data to each consumer
