@@ -30,7 +30,7 @@ export class ExecuteGateway
   }
 
   async handleDisconnect(client: Socket): Promise<void> {
-    await this.executeService.unsubscribe(client.id);
+    await this.executeService.unsubscribe(client.id, client);
     this.logger.log('Disconnected: ' + client.handshake.address);
   }
 
@@ -51,7 +51,7 @@ export class ExecuteGateway
 
   @SubscribeMessage(SubscribedMessage.UNSUBSCRIBE)
   async handleUnsubscription(client: Socket): Promise<WsResponse<boolean>> {
-    await this.executeService.unsubscribe(client.id);
+    await this.executeService.unsubscribe(client.id, client);
 
     return { event: SubscribedMessage.UNSUBSCRIBE_FULFILLED, data: true };
   }

@@ -93,8 +93,6 @@ export class ExecuteService {
     client: Socket,
     serverDetails: SubscribeServerDto,
   ) {
-    this.logger.log(`${id} subscribed`);
-
     if (this.listeners.has(id)) {
       return this.logger.warn(`${id} is subscribing twice. Ignoring.`);
     }
@@ -111,13 +109,18 @@ export class ExecuteService {
       port,
     });
 
+    client.join(serverDetails.ip);
+    this.logger.log(`${id} joined room ${serverDetails.ip}`);
+
     // Emit data to each consumer
     reciever.on('data', (data) =>
-      client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
+      client
+        .to(serverDetails.ip)
+        .emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
     );
   }
 
-  async unsubscribe(id: string) {
+  async unsubscribe(id: string, client: Socket) {
     if (!this.listeners.has(id)) return;
 
     const listener = this.listeners.get(id);
@@ -128,6 +131,7 @@ export class ExecuteService {
     listener.reciever.removeAllListeners();
     listener.reciever.socket.close();
 
+    client.leave(listener.server.ip);
     this.listeners.delete(id);
     this.logger.log('Removed ' + id);
   }
