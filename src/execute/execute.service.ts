@@ -18,6 +18,7 @@ import { WsException } from '@nestjs/websockets';
 interface Listeners {
   reciever: LogReceiver;
   server: SubscribeServerDto;
+  port: number;
 }
 @Injectable()
 export class ExecuteService {
@@ -91,7 +92,7 @@ export class ExecuteService {
     if (this.listeners.has(id)) {
       return this.logger.warn(`${id} is subscribing twice. Ignoring.`);
     }
-    
+
     await this.editLogAddress(serverDetails, 9871);
     
     const reciever = new LogReceiver();
@@ -99,6 +100,7 @@ export class ExecuteService {
     this.listeners.set(id, {
       reciever: reciever,
       server: serverDetails,
+      port: 9871 // @TODO: Replace with random, free port
     });
 
     reciever.on('data', (data) =>
@@ -111,7 +113,7 @@ export class ExecuteService {
 
     const listener = this.listeners.get(id);
 
-    await this.editLogAddress(listener.server, 9871, false);
+    await this.editLogAddress(listener.server, listener.port, false);
 
     listener.reciever.removeAllListeners();
     listener.reciever.socket.close();
