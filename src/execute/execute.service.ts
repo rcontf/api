@@ -23,10 +23,23 @@ interface Listeners {
 export class ExecuteService {
   private logger = new Logger(ExecuteService.name);
   private listeners: Map<string, Listeners> = new Map();
-
   private serverIp: string;
-  constructor(public configService: ConfigService) {
+
+  constructor(configService: ConfigService) {
     this.serverIp = configService.get('SERVER_IP');
+  }
+
+  private async editLogAddress(
+    serverDetails: SubscribeServerDto,
+    port: number,
+    add: boolean = true,
+  ) {
+    return await this.execute({
+      ip: serverDetails.ip,
+      password: serverDetails.password,
+      command: `logaddress_${add ? 'add' : 'del'} ${this.serverIp}:${port}`,
+      port: serverDetails.port,
+    } as ExecuteCommandDto);
   }
 
   async execute(executeDto: ExecuteCommandDto): Promise<RconResponse> {
@@ -75,28 +88,22 @@ export class ExecuteService {
   ) {
     this.logger.log(`${id} subscribed`);
 
-    await this.execute({
-      ip: serverDetails.ip,
-      password: serverDetails.password,
-      command: `logaddress_add ${this.serverIp}:9871`,
-      port: serverDetails.port,
-    } as ExecuteCommandDto);
-
-    if (!this.listeners.has(id)) {
-      const reciever = new LogReceiver();
-
-      this.listeners.set(id, {
-        reciever: reciever,
-        server: serverDetails,
-      });
-
-      reciever.on('data', (data) => {
-        client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message);
-      });
-    } else {
-      this.logger.error('This should never happen here.');
-      throw new WsException('Hit unwanted point');
+    if (this.listeners.has(id)) {
+      return this.logger.warn(`${id} is subscribing twice. Ignoring.`);
     }
+    
+    await this.editLogAddress(serverDetails, 9871);
+    
+    const reciever = new LogReceiver();
+
+    this.listeners.set(id, {
+      reciever: reciever,
+      server: serverDetails,
+    });
+
+    reciever.on('data', (data) =>
+      client.emit(ExecuteSubscribedMessage.RECIEVED_DATA, data.message),
+    );
   }
 
   async unsubscribe(id: string) {
@@ -104,15 +111,11 @@ export class ExecuteService {
 
     const listener = this.listeners.get(id);
 
-    await this.execute({
-      ip: listener.server.ip,
-      password: listener.server.password,
-      command: `logaddress_del ${this.serverIp}:9871`,
-      port: listener.server.port,
-    } as ExecuteCommandDto);
+    await this.editLogAddress(listener.server, 9871, false);
 
-    this.listeners.get(id).reciever.removeAllListeners();
-    this.listeners.get(id).reciever.socket.close();
+    listener.reciever.removeAllListeners();
+    listener.reciever.socket.close();
+
     this.listeners.delete(id);
     this.logger.log('Removed ' + id);
   }
