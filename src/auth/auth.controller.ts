@@ -21,7 +21,7 @@ export class AuthController {
     const newToken = this.jwtService.login(user);
 
     res.cookie('token', newToken, {
-      expires: new Date(Date.now() + 12 * 3600000),
+      expires: new Date(Date.now() + 24 * 3600000 * 5),
     });
 
     return {
