@@ -23,7 +23,7 @@ export class SteamController {
   callback(@User() user: UserEntity, @Response() res: IExpressResponse) {
     const token = this.jwtService.login(user);
     res.cookie('token', token, {
-      expires: new Date(Date.now() + 12 * 3600000),
+      expires: new Date(Date.now() + 24 * 3600000 * 5),
     });
     res.redirect('/');
   }
