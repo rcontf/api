@@ -23,7 +23,6 @@ export class UpdateController {
   updateTf2(@Body() updateDto: UpdateDto, @Res() res: Response) {
     // if (updateDto.secret !== this.configService.get('UPDATE_SECRET'))
     //   return res.status(401);
-
     // return this.updateService.newUpdate(updateDto.type);
   }
 }

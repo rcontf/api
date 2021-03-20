@@ -6,9 +6,14 @@ import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(readonly jwtConfigService: JWTConfigService, private userService: UserService) {
+  constructor(
+    readonly jwtConfigService: JWTConfigService,
+    private userService: UserService,
+  ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(req) => req.cookies['token']]),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req) => req.cookies['token'],
+      ]),
       ignoreExpiration: false,
       secretOrKey: jwtConfigService.createJwtOptions().secret,
     });
@@ -18,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userService.findUser(payload.steamid);
 
     if (!user) {
-        throw new UnauthorizedException('Cannot find user.');
+      throw new UnauthorizedException('Cannot find user.');
     }
 
     return user;
