@@ -1,5 +1,5 @@
-import { Controller, Get, Response, UseGuards } from '@nestjs/common';
-import { Response as IExpressResponse } from 'express';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JWTService } from '../jwt/jwt.service';
 import { SteamStrategy } from './steam.strategy';
@@ -21,7 +21,7 @@ export class SteamController {
 
   @UseGuards(AuthGuard('steam'))
   @Get('/return')
-  callback(@User() user: UserEntity, @Response() res: IExpressResponse) {
+  callback(@User() user: UserEntity, @Res() res: Response) {
     const token = this.jwtService.login(user);
     res.cookie('token', token, {
       expires: new Date(Date.now() + 24 * 3600000 * 5),
