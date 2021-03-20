@@ -1,15 +1,15 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class UpdateServerDto {
-    @IsNotEmpty()
-    readonly hostname: string;
+  @IsNotEmpty()
+  readonly hostname: string;
 
-    @IsNotEmpty()
-    readonly ip: string;
+  @IsNotEmpty()
+  readonly ip: string;
 
-    @IsNotEmpty()
-    readonly password: string;
+  @IsNotEmpty()
+  readonly password: string;
 
-    @IsNumber()
-    readonly port: number = 27015;
+  @IsNumber()
+  readonly port: number = 27015;
 }

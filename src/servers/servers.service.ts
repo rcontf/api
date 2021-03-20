@@ -14,15 +14,15 @@ import { Server, ServerDocument } from './schemas/server.schema';
 export class ServersService {
   constructor(
     @InjectModel(Server.name)
-    private severModel: Model<ServerDocument>,
+    private serverModel: Model<ServerDocument>,
   ) {}
 
   async getServer(ip: string) {
-    return await this.severModel.findOne({ ip: ip });
+    return await this.serverModel.findOne({ ip: ip });
   }
 
   async getUserServers(steamId: string) {
-    return await this.severModel.find({ owner: steamId });
+    return await this.serverModel.find({ owner: steamId });
   }
 
   async createServer(steamId: string, serverDto: CreateServerDto) {
@@ -38,7 +38,7 @@ export class ServersService {
     if (userServers.length >= 3)
       throw new ForbiddenException('You have too many saved servers');
 
-    const newServer = new this.severModel({
+    const newServer = new this.serverModel({
       owner: steamId,
       hostname: serverDto.hostname ?? serverDto.ip,
       ip: serverDto.ip,
@@ -59,7 +59,7 @@ export class ServersService {
 
     if (!doesUserHaveServer) throw new NotFoundException('Cannot find server');
 
-    await this.severModel.findOneAndDelete({ ip: ip });
+    await this.serverModel.findOneAndDelete({ ip: ip });
   }
 
   async updateServer(ip: string, server: UpdateServerDto) {
