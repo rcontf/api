@@ -56,7 +56,10 @@ export class ServersController {
     @Body() serverBody: UpdateServerDto,
     @User() user: UserEntity,
   ) {
-    const updatedServer = await this.serversService.updateServer(ip, serverBody);
+    const updatedServer = await this.serversService.updateServer(
+      ip,
+      serverBody,
+    );
     this.logsService.createLog(ip, user.id, ActionType.UPDATED);
     return updatedServer;
   }

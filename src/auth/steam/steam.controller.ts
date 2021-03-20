@@ -25,9 +25,9 @@ export class SteamController {
     const token = this.jwtService.login(user);
     res.cookie('token', token, {
       expires: new Date(Date.now() + 24 * 3600000 * 5),
-      domain: this.configService.get("COOKIE_DOMAIN")
+      domain: this.configService.get('COOKIE_DOMAIN'),
     });
-    console.log(this.configService.get("COOKIE_DOMAIN"))
-    res.redirect(this.configService.get("HOST"));
+    console.log(this.configService.get('COOKIE_DOMAIN'));
+    res.redirect(this.configService.get('HOST'));
   }
 }

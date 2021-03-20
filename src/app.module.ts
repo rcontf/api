@@ -18,7 +18,7 @@ import { LogsModule } from './logs/logs.module';
         PORT: Joi.number().failover(8080).default(8080),
         DATABASE_URL: Joi.string().trim().required(),
         HOST: Joi.string().default('http://localhost:3000'),
-        COOKIE_DOMAIN: Joi.string().trim().default(""),
+        COOKIE_DOMAIN: Joi.string().trim().default(''),
       }),
     }),
     MongooseModule.forRootAsync({
