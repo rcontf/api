@@ -27,7 +27,6 @@ export class SteamController {
       expires: new Date(Date.now() + 24 * 3600000 * 5),
       domain: this.configService.get('COOKIE_DOMAIN'),
     });
-    console.log(this.configService.get('COOKIE_DOMAIN'));
     res.redirect(this.configService.get('HOST'));
   }
 }
