@@ -1,14 +1,17 @@
-import { Controller, Get, Req, Response, UseGuards } from '@nestjs/common';
-import { Request, Response as IExpressResponse } from 'express';
+import { Controller, Get, Response, UseGuards } from '@nestjs/common';
+import { Response as IExpressResponse } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JWTService } from '../jwt/jwt.service';
 import { SteamStrategy } from './steam.strategy';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/users/decorators/user.decorator';
+import { UserEntity } from 'src/users/decorators/user.type';
 
 @Controller('auth/steam')
 export class SteamController {
   constructor(
     private jwtService: JWTService,
+    private configService: ConfigService,
     readonly steamStrategy: SteamStrategy,
   ) {}
 
@@ -18,14 +21,13 @@ export class SteamController {
 
   @UseGuards(AuthGuard('steam'))
   @Get('/return')
-  async callback(
-    @Req() req: Request,
-    @Response() res: IExpressResponse,
-  ): Promise<void> {
-    const token = await this.jwtService.login(req.user);
+  callback(@User() user: UserEntity, @Response() res: IExpressResponse) {
+    const token = this.jwtService.login(user);
     res.cookie('token', token, {
-      expires: new Date(Date.now() + 12 * 3600000),
+      expires: new Date(Date.now() + 24 * 3600000 * 5),
+      domain: this.configService.get("COOKIE_DOMAIN")
     });
-    res.redirect('/');
+    console.log(this.configService.get("COOKIE_DOMAIN"))
+    res.redirect(this.configService.get("HOST"));
   }
 }
