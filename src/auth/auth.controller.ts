@@ -37,7 +37,9 @@ export class AuthController {
 
   @Get('/logout')
   logout(@Res() res: Response) {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+      domain: this.configService.get('COOKIE_DOMAIN'),
+    });
     res.redirect(this.configService.get('HOST'));
   }
 }
