@@ -5,6 +5,8 @@ import MongoTestingModule from '../utils/test-mongo';
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
 import { UserService } from './users.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import Role from './schemas/role';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 const fakeUser: any = {
   _json: {
@@ -13,6 +15,15 @@ const fakeUser: any = {
     personaname: '24',
   },
 };
+
+class ConfigMock {
+  get(string: string) {
+    switch (string) {
+      case 'SUPER_ADMIN':
+        return '76561198154342943';
+    }
+  }
+}
 
 describe('UserService', () => {
   const mongod = new MongoMemoryServer();
@@ -25,7 +36,13 @@ describe('UserService', () => {
         MongoTestingModule(mongod),
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
       ],
-      providers: [UserService],
+      providers: [
+        UserService,
+        {
+          provide: ConfigService,
+          useClass: ConfigMock,
+        },
+      ],
     }).compile();
 
     userModel = module.get(getModelToken(User.name));
@@ -66,6 +83,26 @@ describe('UserService', () => {
         id: '1234',
         name: '24',
       });
+    });
+
+    it('will give super admin the super admin role', async () => {
+      const spy = jest.spyOn(userModel, 'create');
+      const user = await service.createUser({
+        _json: {
+          steamid: '76561198154342943',
+          avatarfull: 'test_avatar.png',
+          personaname: '24',
+        },
+      } as any);
+
+      expect(user.roles[0]).toEqual(Role.SUPER_ADMIN);
+    });
+
+    it('will not give regular users the super admin role', async () => {
+      const spy = jest.spyOn(userModel, 'create');
+      const user = await service.createUser(fakeUser);
+
+      expect(user.roles).toHaveLength(0);
     });
   });
 
