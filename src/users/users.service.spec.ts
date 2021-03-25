@@ -33,6 +33,7 @@ describe('UserService', () => {
   });
 
   afterEach(async () => await userModel.deleteMany({}));
+  afterAll(async () => await mongod.stop());
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -40,9 +41,18 @@ describe('UserService', () => {
 
   describe('#getUser', () => {
     it('will create a user if not already created', async () => {
+      const spy = jest.spyOn(userModel, 'findOne');
+      const user = await service.getUser(fakeUser);
+      expect(user.id).toEqual('1234');
+      expect(spy).toHaveBeenCalledWith({ id: '1234' });
+    });
+
+    it('will not create a user if already created', async () => {
+      const spy = jest.spyOn(userModel, 'create');
       const user = await service.getUser(fakeUser);
       expect(user).toBeDefined();
       expect(user.id).toEqual('1234');
+      expect(spy).toBeCalledTimes(0);
     });
   });
 
