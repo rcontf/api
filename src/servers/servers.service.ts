@@ -40,7 +40,7 @@ export class ServersService {
 
     const newServer = new this.serverModel({
       owner: steamId,
-      hostname: serverDto.hostname ?? serverDto.ip,
+      hostname: serverDto.hostname,
       ip: serverDto.ip,
       password: serverDto.password,
       port: serverDto.port,

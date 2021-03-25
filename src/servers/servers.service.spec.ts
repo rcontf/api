@@ -125,7 +125,21 @@ describe('ServersService', () => {
     });
   });
 
-  describe('#getServer', () => {
+  describe('#deleteServer', () => {
+    it('will delete the server', async () => {
+      const spy = jest.spyOn(service, 'deleteServer');
+      await service.createServer(mockId, mockServerDto);
+
+      await service.deleteServer('1.2.3.4', mockId);
+      expect(spy).toHaveBeenCalledWith('1.2.3.4', mockId);
+    });
+
+    it('throw an error if it cannot find a server', async () => {
+      expect(service.deleteServer('1.2.3.4', mockId)).rejects.toThrowError();
+    });
+  });
+
+  describe('#updateServer', () => {
     it('will update the server', async () => {
       await service.createServer('1.2.3.4', mockServerDto);
 
