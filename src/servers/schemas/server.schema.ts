@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Logs } from 'src/logs/schemas/log.schema';
+import { Logs } from '../../logs/schemas/log.schema';
 
 export type ServerDocument = Server & Document;
 
