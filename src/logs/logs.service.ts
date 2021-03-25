@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ServersService } from 'src/servers/servers.service';
+import { ServersService } from '../servers/servers.service';
 import { Logs, LogsDocument } from './schemas/log.schema';
 import { ActionType } from './types/action.type';
 

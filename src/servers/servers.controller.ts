@@ -11,10 +11,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LogsService } from 'src/logs/logs.service';
-import { ActionType } from 'src/logs/types/action.type';
-import { User } from 'src/users/decorators/user.decorator';
-import { UserEntity } from 'src/users/decorators/user.type';
+import { LogsService } from '../logs/logs.service';
+import { ActionType } from '../logs/types/action.type';
+import { User } from '../users/decorators/user.decorator';
+import { UserEntity } from '../users/decorators/user.type';
 import { CreateServerDto } from './dto/create-server.dto';
 import { DeleteServerDto } from './dto/delete-server.dto';
 import { UpdateServerDto } from './dto/update-server.dto';

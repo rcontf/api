@@ -39,11 +39,9 @@ class UserStub {
 describe('UserController', () => {
   let service: UserService;
   let controller: UsersController;
-  let userModel: Model<UserDocument>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [],
       providers: [
         {
           provide: UserService,
