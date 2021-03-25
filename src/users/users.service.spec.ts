@@ -39,26 +39,9 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('#getUser', () => {
-    it('will create a user if not already created', async () => {
-      const spy = jest.spyOn(userModel, 'findOne');
-      const user = await service.getUser(fakeUser);
-      expect(user.id).toEqual('1234');
-      expect(spy).toHaveBeenCalledWith({ id: '1234' });
-    });
-
-    it('will not create a user if already created', async () => {
-      const spy = jest.spyOn(userModel, 'create');
-      const user = await service.getUser(fakeUser);
-      expect(user).toBeDefined();
-      expect(user.id).toEqual('1234');
-      expect(spy).toBeCalledTimes(0);
-    });
-  });
-
   describe('#findUser', () => {
     it('can find a user', async () => {
-      await service.getUser(fakeUser); // create fake user
+      await service.createUser(fakeUser); // create fake user
 
       const user = await service.findUser('1234');
 
@@ -73,9 +56,22 @@ describe('UserService', () => {
     });
   });
 
+  describe('#createUser', () => {
+    it('will create a user', async () => {
+      const spy = jest.spyOn(userModel, 'create');
+      const user = await service.createUser(fakeUser);
+      expect(user.id).toEqual('1234');
+      expect(spy).toHaveBeenCalledWith({
+        avatar: 'test_avatar.png',
+        id: '1234',
+        name: '24',
+      });
+    });
+  });
+
   describe('#deleteUser', () => {
     it('can delete a user', async () => {
-      await service.getUser(fakeUser); // create fake user
+      await service.createUser(fakeUser); // create fake user
 
       const user = await service.findUser('1234');
 

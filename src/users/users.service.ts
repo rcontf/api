@@ -10,22 +10,12 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async getUser(reqUser: ISteam.Profile): Promise<UserDocument> {
-    let user: UserDocument | null;
-
-    user = await this.userModel.findOne({ id: reqUser._json.steamid });
-
-    if (!user) {
-      user = new this.userModel({
-        id: reqUser._json.steamid,
-        avatar: reqUser._json.avatarfull,
-        name: reqUser._json.personaname,
-      });
-
-      await user.save();
-    }
-
-    return user;
+  async createUser(reqUser: ISteam.Profile): Promise<UserDocument> {
+    return this.userModel.create({
+      id: reqUser._json.steamid,
+      avatar: reqUser._json.avatarfull,
+      name: reqUser._json.personaname,
+    });
   }
 
   async findUser(steamId: string): Promise<UserDocument> {

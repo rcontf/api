@@ -28,7 +28,12 @@ export class SteamStrategy extends PassportStrategy(Strategy) {
     _identifier: string,
     profile: ISteam.Profile,
   ): Promise<UserDocument> {
-    const userDoc = await this.userService.getUser(profile);
+    const userDoc = await this.userService.findUser(profile._json.steamid);
+
+    if (!userDoc) {
+      return await this.userService.createUser(profile);
+    }
+
     return userDoc;
   }
 }
