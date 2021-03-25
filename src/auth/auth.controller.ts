@@ -1,9 +1,9 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { User } from 'src/users/decorators/user.decorator';
 import { UserEntity } from 'src/users/decorators/user.type';
+import { Auth } from './decorators/auth.decorator';
 import { Cookies } from './decorators/cookie.decorator';
 import { JWTService } from './jwt/jwt.service';
 
@@ -15,7 +15,7 @@ export class AuthController {
   ) {}
 
   @Get('/refresh')
-  @UseGuards(AuthGuard('jwt'))
+  @Auth()
   refresh(
     @Cookies('token') token: string,
     @Res({ passthrough: true }) res: Response,
@@ -36,6 +36,7 @@ export class AuthController {
   }
 
   @Get('/logout')
+  @Auth()
   logout(@Res() res: Response) {
     res.clearCookie('token', {
       domain: this.configService.get('COOKIE_DOMAIN'),
