@@ -14,7 +14,7 @@ const fakeUser: any = {
   },
 };
 
-describe('SquidService', () => {
+describe('UserService', () => {
   const mongod = new MongoMemoryServer();
   let service: UserService;
   let userModel: Model<UserDocument>;
