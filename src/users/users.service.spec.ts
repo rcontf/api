@@ -6,7 +6,7 @@ import { User, UserDocument, UserSchema } from './schemas/user.schema';
 import { UserService } from './users.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import Role from './schemas/role';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 const fakeUser: any = {
   _json: {
@@ -86,7 +86,6 @@ describe('UserService', () => {
     });
 
     it('will give super admin the super admin role', async () => {
-      const spy = jest.spyOn(userModel, 'create');
       const user = await service.createUser({
         _json: {
           steamid: '76561198154342943',
@@ -99,7 +98,6 @@ describe('UserService', () => {
     });
 
     it('will not give regular users the super admin role', async () => {
-      const spy = jest.spyOn(userModel, 'create');
       const user = await service.createUser(fakeUser);
 
       expect(user.roles).toHaveLength(0);
