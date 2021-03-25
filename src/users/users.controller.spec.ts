@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model } from 'mongoose';
 import { UserDocument } from './schemas/user.schema';
 import { UserService } from './users.service';
 import { UsersController } from './users.controller';
