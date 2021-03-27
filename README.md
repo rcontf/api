@@ -1,8 +1,8 @@
 <p align="center">
-  <h1>rcon.tf api</h1>
+  The backend API for rcon.tf, written in TypeScript and NestJS. 
+  <br /> 
+  [![test](https://github.com/rcontf/api/actions/workflows/test.yml/badge.svg)](https://github.com/rcontf/api/actions/workflows/test.yml)
 </p>
-
-<p align="center">The backend API for rcon.tf, written in TypeScript and NestJS.</p>
 
 # Usage
 
@@ -13,7 +13,7 @@
 
 # Tests
 
-N/A
+- 
 
 # Other
 
