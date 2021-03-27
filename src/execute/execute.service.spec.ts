@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecuteService } from './execute.service';
 import rcon from 'rcon-srcds';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 jest.mock('rcon-srcds');
 
@@ -15,12 +19,7 @@ describe('ExecuteService', () => {
   });
 
   beforeAll(() => {
-    rcon.prototype.authenticate = jest.fn(
-      async (password) =>
-        new Promise((resolve, reject) =>
-          password === 'password' ? resolve(true) : reject(false),
-        ),
-    );
+    rcon.prototype.authenticate = jest.fn(async () => Promise.resolve(true));
 
     rcon.prototype.disconnect = jest.fn(async () => Promise.resolve());
 
@@ -30,12 +29,6 @@ describe('ExecuteService', () => {
           return await Promise.resolve('status response');
         case 'boolean':
           return await Promise.resolve(true);
-        case 'error-auth':
-          return Promise.reject(new Error('Error: Unable to authenticate'));
-        case 'error-connection':
-          return Promise.reject(new Error('ECONNREFUSED'));
-        case 'error-notfound':
-          return Promise.reject(new Error('ENOTFOUND'));
       }
     });
   });
@@ -68,6 +61,16 @@ describe('ExecuteService', () => {
     });
 
     describe('will catch', () => {
+      beforeAll(() => {
+        rcon.prototype.authenticate = jest.fn(async (password) => {
+          return new Promise((resolve) =>
+            password === 'password'
+              ? resolve(true)
+              : new Error('Error: Unable to authenticate'),
+          );
+        });
+      });
+
       it('a bad rcon password', async () => {
         expect(
           service.execute({
@@ -76,29 +79,18 @@ describe('ExecuteService', () => {
             password: 'not-a_password',
             port: 27015,
           }),
-        ).rejects.toThrowError();
+        ).rejects.toThrowError(BadRequestException);
       });
 
-      it('address not found error', async () => {
+      it('an unexpected error', async () => {
         expect(
           service.execute({
-            command: 'error-connection',
-            ip: '1.2.3.4',
+            command: null,
+            ip: undefined,
             password: 'password',
             port: 27015,
           }),
-        ).rejects.toThrowError();
-      });
-
-      it('connection refusal error', async () => {
-        expect(
-          service.execute({
-            command: 'error-notfound',
-            ip: '1.2.3.4',
-            password: 'password',
-            port: 27015,
-          }),
-        ).rejects.toThrowError();
+        ).rejects.toThrowError(InternalServerErrorException);
       });
     });
   });
