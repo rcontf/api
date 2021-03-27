@@ -4,8 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { JWTService } from '../jwt/jwt.service';
 import { SteamStrategy } from './steam.strategy';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/users/decorators/user.decorator';
-import { UserEntity } from 'src/users/decorators/user.type';
+import { User } from '../../users/decorators/user.decorator';
+import { UserEntity } from '../../users/decorators/user.type';
 
 @Controller('auth/steam')
 export class SteamController {
