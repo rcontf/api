@@ -1,19 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-steam';
-import { UserDocument } from 'src/users/schemas/user.schema';
-import { UserService } from 'src/users/users.service';
+import { UserService } from '../../users/users.service';
+import { UserDocument } from '../../users/schemas/user.schema';
 import { ISteam } from './steam.type';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 
 @Injectable()
 export class SteamStrategy extends PassportStrategy(Strategy) {
   constructor(
     readonly configService: ConfigService,
     private userService: UserService,
-    @Inject(REQUEST) readonly req: Request,
   ) {
     super({
       returnURL: `${
@@ -28,7 +25,12 @@ export class SteamStrategy extends PassportStrategy(Strategy) {
     _identifier: string,
     profile: ISteam.Profile,
   ): Promise<UserDocument> {
-    const userDoc = await this.userService.getUser(profile);
+    const userDoc = await this.userService.findUser(profile._json.steamid);
+
+    if (!userDoc) {
+      return await this.userService.createUser(profile);
+    }
+
     return userDoc;
   }
 }

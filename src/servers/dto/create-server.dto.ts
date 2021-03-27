@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Expose } from 'class-transformer';
 import { ServerType } from '../schemas/server.schema';
 
 export class CreateServerDto {
@@ -17,9 +16,4 @@ export class CreateServerDto {
 
   @IsString()
   readonly type: ServerType = 'tf2';
-
-  @Expose()
-  get connectAddress(): string {
-    return `rcon_address ${this.hostname}${this.port}; rcon_password ${this.password}`;
-  }
 }

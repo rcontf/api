@@ -1,31 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ISteam } from 'src/auth/steam/steam.type';
+import Role from './schemas/role';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private configService: ConfigService
   ) {}
 
-  async getUser(reqUser: ISteam.Profile): Promise<UserDocument> {
-    let user: UserDocument | null;
+  async createUser(reqUser: ISteam.Profile): Promise<UserDocument> {
+    const superAdminId = this.configService.get("SUPER_ADMIN");
 
-    user = await this.userModel.findOne({ id: reqUser._json.steamid });
-
-    if (!user) {
-      user = new this.userModel({
+    if (reqUser._json.steamid === superAdminId) {
+      return this.userModel.create({
         id: reqUser._json.steamid,
         avatar: reqUser._json.avatarfull,
         name: reqUser._json.personaname,
+        roles: [Role.SUPER_ADMIN]
       });
-
-      await user.save();
     }
 
-    return user;
+    return this.userModel.create({
+      id: reqUser._json.steamid,
+      avatar: reqUser._json.avatarfull,
+      name: reqUser._json.personaname,
+    });
   }
 
   async findUser(steamId: string): Promise<UserDocument> {

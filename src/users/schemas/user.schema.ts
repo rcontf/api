@@ -15,7 +15,7 @@ export class User {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ default: Role.USER })
+  @Prop({ default: [] })
   roles: Role[];
 }
 

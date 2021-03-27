@@ -1,8 +1,8 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { User } from 'src/users/decorators/user.decorator';
-import { UserEntity } from 'src/users/decorators/user.type';
+import { User } from '../users/decorators/user.decorator';
+import { UserEntity } from '../users/decorators/user.type';
 import { Auth } from './decorators/auth.decorator';
 import { Cookies } from './decorators/cookie.decorator';
 import { JWTService } from './jwt/jwt.service';

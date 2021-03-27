@@ -1,13 +1,23 @@
-# build environment
-FROM node:12-alpine
-
-EXPOSE 8080
+FROM node:12-alpine AS build
 WORKDIR /opt/app
 
-COPY package*.json /opt/app/
-COPY . /opt/app/
+COPY package*.json ./
+RUN npm install
 
-RUN ["npm", "install"]
-RUN ["npm", "run", "build"]
+COPY . .
+RUN npm run build
 
-CMD ["npm", "run", "start:prod"]
+FROM node:12-alpine
+WORKDIR /opt/app
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+COPY package*.json ./
+RUN npm install --only=production
+
+COPY --from=build /opt/app/dist ./dist
+
+USER node
+CMD [ "npm", "run", "start:prod" ]
+EXPOSE 8080

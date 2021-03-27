@@ -16,6 +16,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "test:ci": "jest --ci --maxWorkers 4",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
@@ -60,6 +61,7 @@
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.3.1",
     "jest": "^26.6.3",
+    "mongodb-memory-server": "^6.9.6",
     "prettier": "^2.1.2",
     "supertest": "^6.1.1",
     "ts-jest": "^26.4.3",
