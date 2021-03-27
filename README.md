@@ -13,7 +13,7 @@
 
 # Tests
 
-- 
+Run `npm run test` to run the jest suite.
 
 # Other
 
