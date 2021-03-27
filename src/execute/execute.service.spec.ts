@@ -15,8 +15,11 @@ describe('ExecuteService', () => {
   });
 
   beforeAll(() => {
-    rcon.prototype.authenticate = jest.fn(async (password) =>
-      Promise.resolve(password === 'password'),
+    rcon.prototype.authenticate = jest.fn(
+      async (password) =>
+        new Promise((resolve, reject) =>
+          password === 'password' ? resolve(true) : reject(false),
+        ),
     );
 
     rcon.prototype.disconnect = jest.fn(async () => Promise.resolve());
@@ -28,11 +31,11 @@ describe('ExecuteService', () => {
         case 'boolean':
           return await Promise.resolve(true);
         case 'error-auth':
-          throw new Error('Error: Unable to authenticate');
+          return Promise.reject(new Error('Error: Unable to authenticate'));
         case 'error-connection':
-          throw new Error('ECONNREFUSED');
+          return Promise.reject(new Error('ECONNREFUSED'));
         case 'error-notfound':
-          throw new Error('ENOTFOUND');
+          return Promise.reject(new Error('ENOTFOUND'));
       }
     });
   });
