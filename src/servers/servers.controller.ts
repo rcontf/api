@@ -11,10 +11,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { UserDocument } from 'src/users/schemas/user.schema';
 import { LogsService } from '../logs/logs.service';
 import { ActionType } from '../logs/types/action.type';
 import { User } from '../users/decorators/user.decorator';
-import { UserEntity } from '../users/decorators/user.type';
 import { CreateServerDto } from './dto/create-server.dto';
 import { DeleteServerDto } from './dto/delete-server.dto';
 import { UpdateServerDto } from './dto/update-server.dto';
@@ -30,13 +30,13 @@ export class ServersController {
   ) {}
 
   @Get()
-  async getAllServers(@User() user: UserEntity) {
+  async getAllServers(@User() user: UserDocument) {
     return this.serversService.getUserServers(user.id);
   }
 
   @Post()
   async createServer(
-    @User() user: UserEntity,
+    @User() user: UserDocument,
     @Body() createServerDto: CreateServerDto,
   ) {
     return await this.serversService.createServer(user.id, createServerDto);
@@ -45,7 +45,7 @@ export class ServersController {
   @Delete(':ip')
   async deleteServer(
     @Param() params: DeleteServerDto,
-    @User() user: UserEntity,
+    @User() user: UserDocument,
   ) {
     await this.serversService.deleteServer(params.ip, user.id);
   }
@@ -54,7 +54,7 @@ export class ServersController {
   async updateServer(
     @Param('ip') ip: string,
     @Body() serverBody: UpdateServerDto,
-    @User() user: UserEntity,
+    @User() user: UserDocument,
   ) {
     const updatedServer = await this.serversService.updateServer(
       ip,

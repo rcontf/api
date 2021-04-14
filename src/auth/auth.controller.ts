@@ -1,46 +1,42 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import { UserDocument } from 'src/users/schemas/user.schema';
 import { User } from '../users/decorators/user.decorator';
-import { UserEntity } from '../users/decorators/user.type';
+import { AuthService } from './auth.service';
 import { Auth } from './decorators/auth.decorator';
-import { Cookies } from './decorators/cookie.decorator';
-import { JWTService } from './jwt/jwt.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private jwtService: JWTService,
+    private authService: AuthService,
     private configService: ConfigService,
   ) {}
 
+  @UseGuards(AuthGuard('steam'))
+  @Get('steam')
+  redirect() {}
+
+  @UseGuards(AuthGuard('steam'))
+  @Get('steam/return')
+  callback(@User() user: UserDocument, @Res() res: Response) {
+    const token = this.authService.generateToken(user.id);
+
+    const url: string = this.configService.get('CLIENT_URL');
+
+    res.redirect(`${url}/auth/success?token=${token}`);
+  }
+
   @Get('/refresh')
   @Auth()
-  refresh(
-    @Cookies('token') token: string,
-    @Res({ passthrough: true }) res: Response,
-    @User() user: UserEntity,
-  ) {
+  refresh(@Param('token') token: string, @User() user: UserDocument) {
     const oldToken = token;
-    const newToken = this.jwtService.login(user);
-
-    res.cookie('token', newToken, {
-      expires: new Date(Date.now() + 24 * 3600000 * 5),
-      domain: this.configService.get('COOKIE_DOMAIN'),
-    });
+    const newToken = this.authService.generateToken(user.id);
 
     return {
       oldToken,
       newToken,
     };
-  }
-
-  @Get('/logout')
-  @Auth()
-  logout(@Res() res: Response) {
-    res.clearCookie('token', {
-      domain: this.configService.get('COOKIE_DOMAIN'),
-    });
-    res.redirect(this.configService.get('HOST'));
   }
 }
