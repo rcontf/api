@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ISteam } from 'src/auth/steam/steam.type';
+import { Model, ObjectId, UpdateQuery } from 'mongoose';
+import { ISteam } from 'src/auth/types/steam.type';
 import Role from './schemas/role';
 import { User, UserDocument } from './schemas/user.schema';
 
@@ -10,25 +10,31 @@ import { User, UserDocument } from './schemas/user.schema';
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {}
 
-  async createUser(reqUser: ISteam.Profile): Promise<UserDocument> {
-    const superAdminId = this.configService.get("SUPER_ADMIN");
+  async getById(id: string) {
+    return await this.userModel.findById(id);
+  }
 
-    if (reqUser._json.steamid === superAdminId) {
-      return this.userModel.create({
-        id: reqUser._json.steamid,
-        avatar: reqUser._json.avatarfull,
-        name: reqUser._json.personaname,
-        roles: [Role.SUPER_ADMIN]
-      });
-    }
+  async findUserBySteamId(steamId: string) {
+    return await this.userModel.findOne({ steamId });
+  }
 
-    return this.userModel.create({
-      id: reqUser._json.steamid,
-      avatar: reqUser._json.avatarfull,
-      name: reqUser._json.personaname,
+  async createUser(user: ISteam.Profile) {
+    const superAdminId = this.configService.get('SUPER_ADMIN');
+
+    return await this.userModel.create({
+      steamId: user._json.steamid,
+      avatar: user._json.avatarfull,
+      name: user._json.personaname,
+      roles: user._json.steamid === superAdminId ? [Role.SUPER_ADMIN] : [],
+    });
+  }
+
+  async updateUser(userId: string, object: UpdateQuery<User>) {
+    return await this.userModel.findOneAndUpdate({ _id: userId }, object, {
+      new: true,
     });
   }
 
