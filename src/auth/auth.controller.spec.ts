@@ -50,15 +50,8 @@ describe('AuthController', () => {
   describe('#callback', () => {
     it('logs the user in', () => {
       const spy = jest.spyOn(service, 'generateToken');
-      controller.callback('test', userEntitiyMock, responseMock);
+      controller.callback(userEntitiyMock, responseMock);
       expect(spy).toBeCalledTimes(1);
-    });
-
-    it('will use the returnUrl', () => {
-      const spy = jest.spyOn(responseMock, 'redirect');
-      controller.callback('my_url/', userEntitiyMock, responseMock);
-      expect(spy).toBeCalledTimes(1);
-      expect(spy).toBeCalledWith(`my_url/auth/success?token=new_token`)
     });
   });
 
