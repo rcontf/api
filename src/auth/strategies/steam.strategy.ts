@@ -23,7 +23,7 @@ export class SteamStrategy extends PassportStrategy(Strategy) {
 
   async validate(_identifier: string, profile: ISteam.Profile) {
     try {
-      const user = await this.userService.findUser(profile._json.steamid);
+      const user = await this.userService.findUserBySteamId(profile._json.steamid);
       return await this.userService.updateUser(user._id, {
         name: profile._json.personaname,
         avatar: profile._json.avatarfull,
