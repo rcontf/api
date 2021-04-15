@@ -1,37 +1,44 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserEntity } from '../users/decorators/user.type';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { JWTService } from './jwt/jwt.service';
 
-const userEntitiyMock: any = '76561198154342943';
+const userEntitiyMock: UserEntity = {
+  avatar: 'test.jpg',
+  id: '76561198154342943',
+  name: '24',
+};
 
-class AuthStub {
-  generateToken(user: any) {
+class JWTMock {
+  login(user: UserEntity) {
     return 'new_token';
   }
 }
 
 const responseMock = {
+  cookie: (k: string, v: any, opts: any) => {},
+  clearCookie: (k: string, opts: any) => {},
   redirect: () => {},
 } as any;
 
 describe('AuthController', () => {
-  let service: AuthService;
+  let service: JWTService;
   let controller: AuthController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
-          provide: AuthService,
-          useClass: AuthStub,
+          provide: JWTService,
+          useClass: JWTMock,
         },
         ConfigService,
       ],
       controllers: [AuthController],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    service = module.get<JWTService>(JWTService);
     controller = module.get<AuthController>(AuthController);
   });
 
@@ -39,30 +46,25 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('#redirect', () => {
-    it('redirects', () => {
-      const spy = jest.spyOn(controller, 'redirect');
-      controller.redirect();
-      expect(spy).toBeCalledTimes(1);
-    });
-  });
-
-  describe('#callback', () => {
-    it('logs the user in', () => {
-      const spy = jest.spyOn(service, 'generateToken');
-      controller.callback(userEntitiyMock, responseMock);
-      expect(spy).toBeCalledTimes(1);
-    });
-  });
-
   describe('#refresh', () => {
     it('will refresh the users token', async () => {
       const { oldToken, newToken } = controller.refresh(
         'old_token',
+        responseMock,
         userEntitiyMock,
       );
       expect(oldToken).toEqual('old_token');
       expect(newToken).toEqual('new_token');
+    });
+  });
+
+  describe('#logout', () => {
+    it('will logout the user', async () => {
+      const cookieSpy = jest.spyOn(responseMock, 'clearCookie');
+      const redirectSpy = jest.spyOn(responseMock, 'redirect');
+      controller.logout(responseMock);
+      expect(cookieSpy).toHaveBeenCalledTimes(1);
+      expect(redirectSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

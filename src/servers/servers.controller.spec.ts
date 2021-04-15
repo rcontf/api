@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LogsService } from '../logs/logs.service';
 import { ActionType } from '../logs/types/action.type';
+import { UserEntity } from '../users/decorators/user.type';
 import { UpdateServerDto } from './dto/update-server.dto';
 import { ServerDocument } from './schemas/server.schema';
 import { ServersController } from './servers.controller';
@@ -30,7 +31,7 @@ const newServerMock = {
   logs: [],
 };
 
-const userEntitiyMock: any = {
+const userEntitiyMock: UserEntity = {
   avatar: 'test.jpg',
   id: '76561198154342943',
   name: '24',
@@ -91,7 +92,9 @@ describe('ServersController', () => {
     it('will return the users servers', async () => {
       const spy = jest.spyOn(serversService, 'getUserServers');
 
-      const servers = await controller.getAllServers(userEntitiyMock);
+      const servers = await controller.getAllServers(
+        userEntitiyMock as UserEntity,
+      );
       expect(servers).toBe(mockServer);
       expect(spy).toHaveBeenCalledWith(userEntitiyMock.id);
     });
@@ -109,7 +112,10 @@ describe('ServersController', () => {
         port: 27015,
       };
 
-      const newServer = await controller.createServer(userEntitiyMock, mockDto);
+      const newServer = await controller.createServer(
+        userEntitiyMock as UserEntity,
+        mockDto,
+      );
       expect(spy).toBeCalledWith(userEntitiyMock.id, mockDto);
       expect(newServer).toBe(newServerMock);
     });

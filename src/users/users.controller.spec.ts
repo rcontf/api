@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserDocument } from './schemas/user.schema';
 import { UserService } from './users.service';
 import { UsersController } from './users.controller';
+import { UserEntity } from './decorators/user.type';
 
 const testUser: any = {
   _id: 'test_id',
@@ -16,7 +17,7 @@ const mockRes: any = {
   redirect() {},
 };
 
-const userEntitiyMock: any = {
+const userEntitiyMock: UserEntity = {
   avatar: 'test.jpg',
   id: '76561198154342943',
   name: '24',
@@ -59,9 +60,9 @@ describe('UserController', () => {
 
   describe('#getProfile', () => {
     it('will return the users profile', async () => {
-      const { steamId } = controller.getProfile({ steamId: '1234' } as any);
-
-      expect(steamId).toEqual('1234');
+      const user = controller.getProfile(userEntitiyMock as UserEntity);
+      expect(user).toBeDefined();
+      expect(user.id).toEqual('76561198154342943');
     });
   });
 
@@ -69,7 +70,7 @@ describe('UserController', () => {
     it('will delete the users profile', async () => {
       const spy = jest.spyOn(service, 'deleteUser');
 
-      await controller.deleteProfile(userEntitiyMock, mockRes);
+      await controller.deleteProfile(userEntitiyMock as UserEntity, mockRes);
       expect(spy).toBeCalledWith(userEntitiyMock.id);
     });
   });

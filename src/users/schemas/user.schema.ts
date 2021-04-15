@@ -7,7 +7,7 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
   @Prop({ required: true })
-  steamId: string;
+  id: string;
 
   @Prop({ required: true })
   avatar: string;
