@@ -24,6 +24,7 @@ import envValidation from './env-validation';
         uri: configService.get<string>('DATABASE_URL'),
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useFindAndModify: true,
       }),
       inject: [ConfigService],
     }),
