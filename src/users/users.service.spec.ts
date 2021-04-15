@@ -58,12 +58,12 @@ describe('UserService', () => {
 
   describe('#findUser', () => {
     it('can find a user', async () => {
-      const { steamId } = await service.createUser(fakeUser); // create fake user
+      await service.createUser(fakeUser); // create fake user
 
-      const user = await service.findUserBySteamId(steamId);
+      const user = await service.findUser('1234');
 
       expect(user).toBeDefined();
-      expect(user.steamId).toEqual('1234');
+      expect(user.id).toEqual('1234');
     });
 
     it('returns null when no user is found', async () => {
@@ -77,9 +77,12 @@ describe('UserService', () => {
     it('will create a user', async () => {
       const spy = jest.spyOn(userModel, 'create');
       const user = await service.createUser(fakeUser);
-
-      expect(user.steamId).toEqual('1234');
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(user.id).toEqual('1234');
+      expect(spy).toHaveBeenCalledWith({
+        avatar: 'test_avatar.png',
+        id: '1234',
+        name: '24',
+      });
     });
 
     it('will give super admin the super admin role', async () => {
@@ -103,16 +106,17 @@ describe('UserService', () => {
 
   describe('#deleteUser', () => {
     it('can delete a user', async () => {
-      const { steamId } = await service.createUser(fakeUser); // create fake user
-      const before = await service.findUserBySteamId(steamId);
+      await service.createUser(fakeUser); // create fake user
 
-      expect(before).toBeDefined();
-      expect(before.steamId).toEqual('1234');
+      const user = await service.findUser('1234');
+
+      expect(user).toBeDefined();
+      expect(user.id).toEqual('1234');
 
       await service.deleteUser('1234');
+      const deletedUser = await service.findUser('1234');
 
-      const after = await service.findUser('1234');
-      expect(after).toBeNull();
+      expect(deletedUser).toBeNull();
     });
   });
 });
